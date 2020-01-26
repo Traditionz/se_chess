@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/client.js"></script>
+<link rel="SHORTCUT ICON" href="icons/drawstuff%20favicon%2032x32.ico" type="image/x-icon" />
+<link rel="ICON" href="icons/drawstuff%20favicon%2032x32.ico" type="image/ico" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<style>
+
+body {
+	margin: 0;
+}
+
+ul {
+
+	list-style-type: none;
+	margin: 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #333;
+	position: fixed;
+	top: 0;
+	width: 100%;
+}
+
+li {
+	float: left;
+}
+
+li a {
+	display: block;
+	color: white;
+	text-align: center;
+	padding: 14px 16px;
+	text-decoration: none;
+}
+
+li a:hover:not(.active) {
+	background-color: #000000;
+}
+
+li a:hover:not(.active2) {
+	background-color: #000000;
+}
+
+li a:hover:not(.active3) {
+	background-color: #000000;
+	ChangeTool("draw");
+}
+
+li a:hover:not(.active4) {
+	background-color: #000000;
+}
+
+.active {
+	background-color: #4CAF50;
+}
+
+.active2 {
+	background-color: #ff0000;
+}
+
+.active3 {
+	background-color: #808080;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	height: 18px;
+	width: 50px;
+	left: 50%;
+}
+
+.active4 {
+	background-color: #FF7F00;
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-position: 50% 50%;
+	height: 18px;
+	width: 18px;
+}
+
+buttonbox {
+	background-image: url("background.jpg");
+	right: 0;
+	width: 17%;
+	background-color: #1111;
+	position: fixed;
+	height: 100%;
+	margin-top: 65px;
+	overflow-wrap: break-word;
+	border-style: solid;
+	border-width: 2px;
+}
+
+colors {
+	position: fixed;
+	right: 17%;
+	margin-top: 40px;
+}
+
+input {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	display:inline-block;
+	vertical-align:left-side;
+	width:275px;
+	height:650px;
+	overflow-wrap: break-word;
+}
+.enter_butt {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+	width: 280px;
+}
+.enter_butt2 {
+    background-color: red; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+	width: 280px;
+}
+
+.board { 
+	background-color:#ffffff; 
+	height:100%;
+}
+
+</style>
+<script>
+
+
+</script>
+</head>
+
+<body onload="Initialize()">
+
+	<ul>
+		<center>
+		<h2 style="color:white">CHESS</h2>
+		</center>
+		<!--
+		<li style="float:right"><a class="active2">Forfeit</a></li>
+		<li style="float:right"><a class="active">Reset</a></li>
+		-->
+	</ul>
+
+	<buttonbox>
+		
+			<div class="movelogs" style="height:0%; padding:0px; background-color: white;"></div>
+		
+				<center>
+		
+					<br>
+					<form>
+						<h3>Move history</h3>
+						<input type="text" rows="5" cols="2" id="key"></input>
+					</form>
+					
+					<br>
+	
+					<button class='enter_butt2' onclick='Forfeit()'>Forfeit</button>
+					<button class='enter_butt' onclick='Reset()'>Reset</button>
+	
+				</center>
+			
+
+	</buttonbox>
+			
+</body>
+</html>
