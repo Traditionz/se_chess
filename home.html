@@ -1,0 +1,41 @@
+<!DOCTYPE HTML?
+<html>
+	<head>
+		<script type="text/javascript">
+			//create a chess game and generate room key
+			function play(){
+				//generate key for room
+				
+				//changes page to the chess page
+				window.location.href = 'launch.html'
+				
+			};
+			
+			
+			//join a pre-existing game
+			function join(){
+				//gets the value that is entered in the text box
+				var codeID = document.getElementById("key").value;
+				console.log(codeID);
+			};
+		</script>
+		<title>
+			Chess
+		</title>
+	</head>
+	
+	<body>
+		<!--Button that calls the play() function -->
+		<div>
+			<input onclick="play()" type="button" value="Play!">
+		</div>
+		<!--Text box to enter the room key -->
+		<div>
+			<input type=text placeholder="Enter room ID" id="key">
+		</div>
+		<!--Button that calls the join() function -->
+		<div>
+			<input onclick="join()" type="button" value="Join game">
+		</div>
+	</body>
+</html>
