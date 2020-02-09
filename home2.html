@@ -1,0 +1,158 @@
+<!--Home version 2 by Ziwei Hou (Doing icon/background)-->
+
+<!DOCTYPE HTML>
+<html lang="en">
+
+<head>
+    <link rel="SHORTCUT ICON" href="" type="image/x-icon" />
+    <link rel="ICON" href="" type="image/ico" />
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width = device-width, initial-scale = 1">
+	
+	<title>Interactive Chess</title>
+
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+	<style>
+		.container1 {
+			position: absolute;
+			top: 47%;
+			left: 50%;
+			margin-top: -200px;
+			margin-left: -200px;
+			width: 450px;
+			height: 225px;
+			vertical-align: middle;
+			padding: 10px;
+			border: 2px solid #000;
+			border-radius: 15px;
+			-moz-border-radius: 15px;
+            background-color: white
+		}
+		
+		.container2 {
+			position: absolute;
+			top: 72%;
+			left: 50%;
+			margin-top: -200px;
+			margin-left: -200px;
+			width: 450px;
+			height: 225px;
+			vertical-align: middle;
+			padding: 10px;
+			border: 2px solid #000;
+			border-radius: 15px;
+			-moz-border-radius: 15px;
+            background-color: white
+		}
+		
+		
+		.button {
+			background:    #00FF7F;
+			border-radius: 75%;
+			padding:       8px 20px;
+			color:         #000;
+			display:       inline-block;
+			font:          normal 700 24px/1 "Calibri", sans-serif;
+			text-align:    center;
+		}
+
+		
+		label {
+			display: inline-block;
+			width: 200px;
+			text-align: center;
+		}
+		
+		input {
+			margin-top: 5px;
+			margin-bottom: 5px;
+			display: inline-block;
+			vertical-align: left-side;
+			margin-left: 0px;
+			width: 200px
+		}
+        .submit_button1 {
+            background-color: #4CAF50; /* Green */
+            border: none;
+			border-radius: 12px;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 22px;
+            margin: 4px 2px;
+            cursor: pointer;
+			width: 200px;
+        }
+		
+		.submit_button2 {
+            background-color: #4486c6; /* Blue */
+            border: none;
+			border-radius: 12px;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 22px;
+            margin: 4px 2px;
+            cursor: pointer;
+			width: 200px;
+        }
+		
+		.button1 {
+            width: 200px;
+        }
+	</style>
+</head>
+
+<body background="icons/background_placeholder.jpg">
+	
+	<script>
+	
+	</script>
+
+	<div class="title">
+		<center>
+			<br><br><img src="icons/Chess_placeholder.png">
+		</center>
+	</div>
+	
+	<div class="container1">
+		<center>
+			<h2>Create a game</h2>
+			<form action= "Create" method="POST">
+			<div>
+				<label>Create a Game Key:</label>
+				<input type="text" name="username" placeholder="Key" rows="1" required></label>
+				<br><br>
+				<button class="submit_button1">Create</button>
+				<br><br>
+			</div>
+			</form>
+			<br>
+		</center>
+	</div>
+	
+	<div class="container2">
+		<center>
+			<h2>Join a Game</h2>
+			<form action= "Create" method="POST">
+			<div>
+				<label>Enter a Game Key:</label>
+				<input type="password" name="password" placeholder="Key" rows="1" required></label>
+				<br><br>
+                <button class="submit_button2">Join</button>
+			</div>
+			</form>
+			<br>
+		</center>
+	</div>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.js"></script>
+</body>
+
+</html>
