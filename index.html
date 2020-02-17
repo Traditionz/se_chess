@@ -1,70 +1,248 @@
 <!doctype html>
 <html>
   <head>
-    <title>Socket.IO chat</title>
+    <title>Interactive Chess Game</title>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font: 13px Helvetica, Arial; }
-      form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-      form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-      form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-      #messages { list-style-type: none; margin: 0; padding: 0; }
-      #messages li { padding: 5px 10px; }
-      #messages li:nth-child(odd) { background: #eee; }
+      .selected{
+        background: green;
+      }
+
+      #forfeit {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 15px 32px;
+        text-decoration: none;
+        font-size: 15px;
+        margin: 4px 2px;
+        cursor: pointer;
+      }
+
+      #chessBoard{
+        /* display: inline-block; */
+        /* border: 2px outset lightGray; */
+        position: absolute;
+        text-align: center;
+        font-size: 4em;
+        /* margin-left:480px;
+        margin-top: 60px; */
+        margin-left: 34%;
+        margin-top: 4.25%;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        /* margin-top:-325px; */
+      }
+
+      .status {
+        display: flex;
+        justify-content: center;
+        font-size: 2em;
+      }
+
+      #chessBoard tr{
+          /* line-height: 1px; */
+      }
+
+      #chessBoard td{
+          /* display: inline-block; */
+          width: 64px;
+          height: 64px;
+      }
+
+      #chessBoard tr:nth-child(odd) td:nth-child(even),
+      #chessBoard tr:nth-child(even) td:nth-child(odd){
+          background-color: brown;
+      }
+      #chessBoard tr:nth-child(even) td:nth-child(even),
+      #chessBoard tr:nth-child(odd) td:nth-child(odd){
+          background-color: snow;
+      }
     </style>
   </head>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
-  <script>
+  <script type="text/javascript">
+    const chessMapping = {
+      "black":{
+        "rock": "&#9820;",
+        "knight": "&#9822;",
+        "bishop": "&#9821;",
+        "queen": "&#9819;",
+        "king": "&#9818;",
+        "pawn": "&#9823;"
+      },
+      "white":{
+        "rock": "&#9814;",
+        "knight": "&#9816;",
+        "bishop": "&#9815;",
+        "queen": "&#9813;",
+        "king": "&#9812;",
+        "pawn": "&#9817;"
+      }
+    }
+
     $(function(){
       var socket = io();
+      socket.emit("join_game_page");
+      var room = null;
+      var msg = null;
+      var is_p1 = null;
+      var clicked_cnt = 0;
+      var clicked_pos = null;
+      function get_pos_id(row, col){
+        return row + "," + col;
+      }
+      function display_last_move(){
+        console.log(room.chess)
+        var prev_moves = room.chess.prev_moves;
+        if(prev_moves.length == 0)
+          return;
+        var from = prev_moves[prev_moves.length-1].from;
+        var to = prev_moves[prev_moves.length-1].to;
+
+        var from_id = get_pos_id(from.row, from.col);
+        var to_id = get_pos_id(to.row, to.col);
+        document.getElementById(from_id).style.background = "green";
+        document.getElementById(to_id).style.background = "green";
+
+      }
+
+      render_board = function(server_board) {
+        var table = document.getElementById("chessBoard");
+        table.innerHTML = "";
+        var size = server_board.length;
+        for (var i=0; i<size; i++) {
+          var row = table.appendChild(document.createElement("tr"));
+          for (var j=0; j<size; j++) {
+            var piece = document.createElement("td");
+            var server_piece = server_board[i][j];
+            var piece_value = "";
+            var id = i + "," + j;
+            if(server_piece != null) {
+                var is_black = server_piece.is_player1;
+                if(is_black)
+                  piece_value = chessMapping["black"][server_piece.type];
+                else
+                  piece_value = chessMapping["white"][server_piece.type];
+            }
+            piece.id = id;
+            piece.innerHTML = piece_value
+            piece.onclick = on_click;
+            row.appendChild(piece);
+          }
+
+        }
+        //document.getElementById("forfeit").style.display = "inline-block";
+        display_last_move();
+      }
+      on_click = function() {
+        var pos = this.id.split(",");
+
+        if(clicked_cnt == 0){
+          clicked_cnt++;
+          clicked_pos = pos;
+
+          this.style.background = "orange";
+          var r = parseInt(pos[0]);
+          var c = parseInt(pos[1]);
+          var avail_moves = room.chess.board[r][c].available_moves;
+          for (var i = 0; i < avail_moves.length; i++) {
+            var id = avail_moves[i].row + "," + avail_moves[i].col;
+            document.getElementById(id).style.background = "yellow";
+          }
+        }
+        else{
+          var pos_source = clicked_pos;
+          var pos_des = pos;
+          var move_string = pos_source[0] + ',' + pos_source[1] + ',' + pos_des[0] + ',' + pos_des[1];
+          socket.emit('move', move_string);
+          clicked_pos = null;
+          clicked_cnt = 0;
+
+
+        }
+      }
+      function update_status(text){
+        $("#msg" ).html(text);
+      }
+      function update_game_status(){
+        var game_status = room.chess.game_status
+
+        if(game_status == room.chess.P1_WIN || game_status == room.chess.P2_WIN){
+          p1_win = (game_status == room.chess.P1_WIN)? true: false;
+          if(is_p1 && p1_win){
+            $("#game_status").html("You win!!");
+          }
+          else{
+            $("#game_status").html("Checkmate! You lose :(");
+          }
+          return;
+        }
+
+        if(room.chess.is_check == true){
+          if(is_p1 == room.chess.p1_turn)
+            $("#game_status").html("You are in check");
+          else
+            $("#game_status").html("Your opponent are in check!");
+        }
+        else{
+          $("#game_status").html("");
+        }
+      }
+      function update_room_status(){
+        $("#room").html("Room Number: " + room.room_number);
+        update_game_status();
+        if(msg != null){
+          update_status(msg);
+
+        }
+
+      }
       $('form').submit(function(e){
         e.preventDefault(); //prevent page reloading
         var room = $('#m').val();
         console.log('user enter: ' +room);
-        socket.emit('join', room);
+        if(room == 'CREATE')
+          socket.emit('create');
+        else
+          socket.emit('join', room);
         $('#m').val('');
         return false;
       });
-      $("#msgbtn").on("click", function(){
-        var msg = $('#msg').val();
-        console.log(msg);
-        socket.emit('msg', msg);
-        $('#msg').val('');
-      })
       socket.on('msg', function(response){
-        if(response.success){
-          $("#result").html("new move from your opponent: " + response.data.message);
-          console.log(response.data.details);
-
-        }
-        else{
-          $("#result").html("Error from msg channel");
-        }
+        update_status(response.data.msg);
+      })
+      socket.on('render', function(response){
+        console.log("Request to render", response)
+        room = response.data.details;
+        msg = response.data.msg;
+        is_p1 = response.data.is_p1
+        render_board(room.chess.board);
+        update_room_status();
       })
       socket.on('join', function(response){
-        console.log(response)
         if(response.success){
-          $("#result").html("entered room numner: " + response.data.room);
         }
         else{
-          $("#result").html(response.error);
+          update_status(response.error)
         }
       });
-
     });
 
   </script>
   <body>
-    <div id="result">
+    <div class="status" id="room">
 
     </div>
-    <div>
-        <input id="msg" value=""><button id="msgbtn">Move</button>
+    <div class= "status" id="msg">
     </div>
-    <ul id="messages"></ul>
-    <form action="">
-      <input id="m" autocomplete="off" /><button>Send</button>
-    </form>
+    <div class= "status" id="game_status">
+    </div>
+
+    <div class="cointainer" id="chessBoard">
+
+    </div>
+    <!-- <div style="text-align:center;"><button id="forfeit">Forfeit</button></div> -->
   </body>
 </html>

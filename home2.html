@@ -8,7 +8,12 @@
     <link rel="ICON" href="" type="image/ico" />
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width = device-width, initial-scale = 1">
-	
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
 	<title>Interactive Chess</title>
 
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -29,7 +34,7 @@
 			-moz-border-radius: 15px;
             background-color: white
 		}
-		
+
 		.container2 {
 			position: absolute;
 			top: 72%;
@@ -37,7 +42,7 @@
 			margin-top: -200px;
 			margin-left: -200px;
 			width: 450px;
-			height: 225px;
+			height: 250px;
 			vertical-align: middle;
 			padding: 10px;
 			border: 2px solid #000;
@@ -45,8 +50,8 @@
 			-moz-border-radius: 15px;
             background-color: white
 		}
-		
-		
+
+
 		.button {
 			background:    #00FF7F;
 			border-radius: 75%;
@@ -57,13 +62,13 @@
 			text-align:    center;
 		}
 
-		
+
 		label {
 			display: inline-block;
 			width: 200px;
 			text-align: center;
 		}
-		
+
 		input {
 			margin-top: 5px;
 			margin-bottom: 5px;
@@ -86,7 +91,7 @@
             cursor: pointer;
 			width: 200px;
         }
-		
+
 		.submit_button2 {
             background-color: #4486c6; /* Blue */
             border: none;
@@ -101,58 +106,77 @@
             cursor: pointer;
 			width: 200px;
         }
-		
+
 		.button1 {
             width: 200px;
         }
 	</style>
 </head>
 
+<script>
+  socket = null;
+  $(function(){
+    socket = io();
+
+    $("#join").on("click", function(){
+      var room = $('#room_id').val();
+      $('#room_id').val('');
+      console.log("Join room " + room);
+      socket.emit('join_home_page', room);
+    });
+    $("#create").on("click", function(){
+      console.log("Create room");
+      socket.emit('create');
+    });
+    socket.on('join', function(response){
+      window.location.replace(response);
+    })
+  });
+
+
+</script>
 <body background="icons/background_placeholder.jpg">
-	
-	<script>
-	
-	</script>
+
 
 	<div class="title">
 		<center>
 			<br><br><img src="icons/Chess_placeholder.png">
 		</center>
 	</div>
-	
+
 	<div class="container1">
 		<center>
 			<h2>Create a game</h2>
-			<form action= "Create" method="POST">
 			<div>
-				<label>Create a Game Key:</label>
-				<input type="text" name="username" placeholder="Key" rows="1" required></label>
+				<label>Username:</label>
+				<input type="text" id="usr_name1" placeholder="Username" rows="1" required></label>
 				<br><br>
-				<button class="submit_button1">Create</button>
+				<button class="submit_button1" id="create">Create</button>
 				<br><br>
 			</div>
-			</form>
+
 			<br>
 		</center>
 	</div>
-	
+
 	<div class="container2">
 		<center>
 			<h2>Join a Game</h2>
-			<form action= "Create" method="POST">
-			<div>
-				<label>Enter a Game Key:</label>
-				<input type="password" name="password" placeholder="Key" rows="1" required></label>
-				<br><br>
-                <button class="submit_button2">Join</button>
-			</div>
-			</form>
+      <div>
+        <label>Username:</label>
+        <input type="text" id="usr_name2" placeholder="Username" rows="1" required></label>
+        <label>Room ID:</label>
+        <input type="text" id="room_id" placeholder="Room id" rows="1" required></label>
+        <br><br>
+        <button class="submit_button1" id="join">Join</button>
+        <br><br>
+      </div>
+
 			<br>
 		</center>
 	</div>
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.js"></script>
+
+
 </body>
 
 </html>
