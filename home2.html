@@ -1,182 +1,180 @@
 <!--Home version 2 by Ziwei Hou (Doing icon/background)-->
-
 <!DOCTYPE HTML>
 <html lang="en">
+	<head>
+		<link rel="SHORTCUT ICON" href="" type="image/x-icon" />
+		<link rel="ICON" href="" type="image/ico" />
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width = device-width, initial-scale = 1">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
 
-<head>
-    <link rel="SHORTCUT ICON" href="" type="image/x-icon" />
-    <link rel="ICON" href="" type="image/ico" />
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width = device-width, initial-scale = 1">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <script src="/socket.io/socket.io.js"></script>
-
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-
-
-	<title>Interactive Chess</title>
-
-	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
-	<style>
-		.container1 {
-			position: absolute;
-			top: 47%;
-			left: 50%;
-			margin-top: -200px;
-			margin-left: -200px;
-			width: 450px;
-			height: 225px;
-			vertical-align: middle;
-			padding: 10px;
-			border: 2px solid #000;
-			border-radius: 15px;
-			-moz-border-radius: 15px;
-            background-color: white
-		}
-
-		.container2 {
-			position: absolute;
-			top: 72%;
-			left: 50%;
-			margin-top: -200px;
-			margin-left: -200px;
-			width: 450px;
-			height: 250px;
-			vertical-align: middle;
-			padding: 10px;
-			border: 2px solid #000;
-			border-radius: 15px;
-			-moz-border-radius: 15px;
-            background-color: white
-		}
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
 
-		.button {
-			background:    #00FF7F;
-			border-radius: 75%;
-			padding:       8px 20px;
-			color:         #000;
-			display:       inline-block;
-			font:          normal 700 24px/1 "Calibri", sans-serif;
-			text-align:    center;
-		}
+		<title>Interactive Chess</title>
+
+		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+		<style>
+			body {
+				background-image: url('background2.jpg');
+				background-size: 100vw 100vh;
+			}
+			.container1 {
+				position: absolute;
+				top: 47%;
+				left: 50%;
+				margin-top: -200px;
+				margin-left: -200px;
+				width: 450px;
+				height: 225px;
+				vertical-align: middle;
+				padding: 10px;
+				border: 2px solid #000;
+				border-radius: 15px;
+				-moz-border-radius: 15px;
+				background-color:aliceblue;
+			}
+
+			.container2 {
+				position: absolute;
+				top: 72%;
+				left: 50%;
+				margin-top: -200px;
+				margin-left: -200px;
+				width: 450px;
+				height: 250px;
+				vertical-align: middle;
+				padding: 10px;
+				border: 2px solid #000;
+				border-radius: 15px;
+				-moz-border-radius: 15px;
+				background-color: aliceblue;
+			}
 
 
-		label {
-			display: inline-block;
-			width: 200px;
-			text-align: center;
-		}
-
-		input {
-			margin-top: 5px;
-			margin-bottom: 5px;
-			display: inline-block;
-			vertical-align: left-side;
-			margin-left: 0px;
-			width: 200px
-		}
-        .submit_button1 {
-            background-color: #4CAF50; /* Green */
-            border: none;
-			border-radius: 12px;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 22px;
-            margin: 4px 2px;
-            cursor: pointer;
-			width: 200px;
-        }
-
-		.submit_button2 {
-            background-color: #4486c6; /* Blue */
-            border: none;
-			border-radius: 12px;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 22px;
-            margin: 4px 2px;
-            cursor: pointer;
-			width: 200px;
-        }
-
-		.button1 {
-            width: 200px;
-        }
-	</style>
-</head>
-
-<script>
-  socket = null;
-  $(function(){
-    socket = io();
-
-    $("#join").on("click", function(){
-      var room = $('#room_id').val();
-      $('#room_id').val('');
-      console.log("Join room " + room);
-      socket.emit('join_home_page', room);
-    });
-    $("#create").on("click", function(){
-      console.log("Create room");
-      socket.emit('create');
-    });
-    socket.on('join', function(response){
-      window.location.replace(response);
-    })
-  });
+			.button {
+				background:    #00FF7F;
+				border-radius: 75%;
+				padding:       8px 20px;
+				color:         #000;
+				display:       inline-block;
+				font:          normal 700 24px/1 "Calibri", sans-serif;
+				text-align:    center;
+			}
 
 
-</script>
-<body background="icons/background_placeholder.jpg">
+			label {
+				display: inline-block;
+				width: 200px;
+				text-align: center;
+			}
+
+			input {
+				margin-top: 5px;
+				margin-bottom: 5px;
+				display: inline-block;
+				vertical-align: left-side;
+				margin-left: 0px;
+				width: 200px
+			}
+			.submit_button1 {
+				background-color: #4CAF50; /* Green */
+				border: none;
+				border-radius: 12px;
+				color: white;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 22px;
+				margin: 4px 2px;
+				cursor: pointer;
+				width: 200px;
+			}
+
+			.submit_button2 {
+				background-color: #4486c6; /* Blue */
+				border: none;
+				border-radius: 12px;
+				color: white;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 22px;
+				margin: 4px 2px;
+				cursor: pointer;
+				width: 200px;
+			}
+
+			.button1 {
+				width: 200px;
+			}
+		</style>
+	</head>
+
+	<script>
+	socket = null;
+	$(function(){
+		socket = io();
+
+		$("#join").on("click", function(){
+		var room = $('#room_id').val();
+		$('#room_id').val('');
+		console.log("Join room " + room);
+		socket.emit('join_home_page', room);
+		});
+		$("#create").on("click", function(){
+		console.log("Create room");
+		socket.emit('create');
+		});
+		socket.on('join', function(response){
+		window.location.replace(response);
+		})
+	});
 
 
-	<div class="title">
-		<center>
-			<br><br><img src="icons/Chess_placeholder.png">
-		</center>
-	</div>
+	</script>
+	<body>
+		<div class="title">
+			<center>
+				<br><br><img src="logo.png">
+			</center>
+		</div>
 
-	<div class="container1">
-		<center>
-			<h2>Create a game</h2>
-			<div>
-				<label>Username:</label>
-				<input type="text" id="usr_name1" placeholder="Username" rows="1" required></label>
-				<br><br>
-				<button class="submit_button1" id="create">Create</button>
-				<br><br>
-			</div>
+		<div class="container1">
+			<center>
+				<h2>Create a game</h2>
+				<div>
+					<label>Username:</label>
+					<input type="text" id="usr_name1" placeholder="Username" rows="1" required></label>
+					<br><br>
+					<button class="submit_button1" id="create">Create</button>
+					<br><br>
+				</div>
 
-			<br>
-		</center>
-	</div>
+				<br>
+			</center>
+		</div>
 
-	<div class="container2">
-		<center>
-			<h2>Join a Game</h2>
-      <div>
-        <label>Username:</label>
-        <input type="text" id="usr_name2" placeholder="Username" rows="1" required></label>
-        <label>Room ID:</label>
-        <input type="text" id="room_id" placeholder="Room id" rows="1" required></label>
-        <br><br>
-        <button class="submit_button1" id="join">Join</button>
-        <br><br>
-      </div>
+		<div class="container2">
+			<center>
+				<h2>Join a Game</h2>
+				<div>
+					<label>Username:</label>
+					<input type="text" id="usr_name2" placeholder="Username" rows="1" required></label>
+					<label>Room ID:</label>
+					<input type="text" id="room_id" placeholder="Room id" rows="1" required></label>
+					<br><br>
+					<button class="submit_button1" id="join">Join</button>
+					<br><br>
+				</div>
+				<br>
+			</center>
+		</div>
 
-			<br>
-		</center>
-	</div>
 
-
-</body>
-
+	</body>
 </html>
