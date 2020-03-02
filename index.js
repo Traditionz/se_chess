@@ -1,33 +1,51 @@
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').createServer(app);
+
 var io = require('socket.io')(http);
-const Chess = require('./chess.js');
-const ROOT = '/';
-const CHAR = 'abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+app.use(express.static('.'));
+const session = require('cookie-session')({
+    name: 'interactive-chess-game',
+    secret: 'dasdas0i-23mkjda0-123'
+});
+
+const RequestHandler = require('./requestHandler.js');
+const PORT = process.env.PORT || 5000;
+
+var request_handler = new RequestHandler();
+
+
 
 app.get('/', function(req, res){
-  res.sendFile(__dirname + '/index.html');
-});
-var ROOM_IDS = {};
+  session(req, res, () => {
+    var user_id = req.session.user_id;
 
-function random_id(){
-  var length = Math.floor(Math.random()*3) + 5;
-  var id = []
-  for(var i = 0; i < length; i++){
-    id.push(CHAR[Math.floor(Math.random()*CHAR.length)]);
-  }
-  return id.join('');
-}
-function new_room_number(){
-  var id = random_id();
-  while(ROOM_IDS.hasOwnProperty(id)){
-    id = random_id();
-  }
-  return id;
-}
-function get_rooms(io){
-  return io.nsps[ROOT].adapter.rooms
-}
+    if(!request_handler.authenticate_user(user_id).success)
+      req.session.user_id = request_handler.create_new_user();
+
+    if(request_handler.get_user_room(user_id) == null)
+      res.sendFile(__dirname + '/home.html');
+    else
+      res.redirect("game_page");
+  })
+
+
+});
+
+app.get("/game_page", function(req, res){
+  session(req, res, () => {
+    var user_id = req.session.user_id;
+    if(!request_handler.authenticate_user(user_id).success || request_handler.get_user_room(user_id) == null){
+      res.redirect("/");
+    }
+    else{
+      res.sendFile(__dirname + '/game_page.html');
+    }
+
+  })
+
+})
+
 function get_response(success, error, data){
   return {
       success: success,
@@ -35,59 +53,112 @@ function get_response(success, error, data){
       data: data
     }
 }
-function create_new_room(player1_id){
-  room = new_room_number();
-  var new_game = new Chess();
-  ROOM_IDS[room] = {
-    p1: player1_id,
-    p2: null,
-    chess: new_game
-  }
-  return room;
-}
+
 io.on('connection', function(socket){
+
+  var cookieString = socket.request.headers.cookie;
+  var req = {connection: {encrypted: false}, headers: {cookie: cookieString}}
+  var res = {getHeader: () =>{}, setHeader: () => {}};
+  session(req, res, () => {});
+
+
   console.log('a user connected with id: ' + socket.id);
 
-  socket.on('join', function(room){
-    console.log('some one want to join: ' + room);
-    var rooms = get_rooms(io);
-    if(room != 'CREATE' && (!rooms[room] || rooms[room].length == 2)){
-      io.to(socket.id).emit('join', get_response(false, "Room does not exist or full, please create new room", null));
+  socket.on('create', function(input){
+    var username = input.username;
+    var user_id = req.session.user_id;
+    console.log(user_id + "wants to create new room with username " + username);
+    var create_room_result = request_handler.create_room(user_id, username);
+
+    if(!create_room_result.success){
+      io.to(socket.id).emit('msg', get_response(false, create_room_result.msg, null));
       return;
     }
-    var join_room = room;
-    if(room == 'CREATE'){
-      join_room = create_new_room(socket.id);
-    }
-    else{
-      ROOM_IDS[join_room].p2 = socket.id;
-    }
-    socket.join(join_room);
-    console.log('join the room: ' + join_room);
-    io.to(socket.id).emit('join', get_response(true, null, {room: join_room, details: ROOM_IDS[join_room]}));
-  })
-  socket.on('msg', function(msg){
-    //Make sure user has entered the chess room
-    var socket_rooms = socket.rooms;
-    var rooms = Object.keys(socket_rooms);
-    if(rooms.length != 2) return;
-    var chess_room = rooms[0];
-    if(chess_room == socket.id) chess_room = rooms[1];
 
-    console.log('Message from: ' + socket.id + " " + msg);
-    console.log("Room number: " + chess_room);
-    var move = msg.split(',');
-    var game = ROOM_IDS[chess_room].chess
-    console.log(game.move(parseInt(move[0]),parseInt(move[1]),parseInt(move[2]),parseInt(move[3])));
-    socket.to(chess_room).emit('msg', get_response(true, null, {message: msg, details: game.toString()}));
+    var new_room = request_handler.get_user_room(user_id);
+
+    socket.join(new_room);
+
+    io.to(socket.id).emit('join', "/game_page");
+
+  })
+  socket.on('join_home_page', function(input){
+    var username = input.username;
+    var room_id = input.room;
+    var user_id = req.session.user_id;
+    console.log( user_id + ' wants to join: ' + room_id + ' with username ' + username);
+
+    var join_room_result = request_handler.join_room(user_id, room_id, username);
+    if(!join_room_result.success){
+      io.to(socket.id).emit('msg', get_response(false, join_room_result.msg, null));
+      return;
+    }
+
+    io.to(socket.id).emit('join', "game_page");
+
+  })
+  socket.on('join_game_page', function(){
+    var user_id = req.session.user_id;
+    console.log(user_id + "wants to join the game page");
+    var room = request_handler.get_user_room(user_id);
+
+    if(room == null){
+      io.to(socket.id).emit('msg', get_response(false, "Something wrong happened, please refresh the page", null));
+      return;
+    }
+
+    var join_room_result = request_handler.join_room(user_id, room.room_number);
+    if(!join_room_result.success){
+      io.to(socket.id).emit('msg', get_response(false, "Something wrong happened, please refresh the page", null));
+      return;
+    }
+    socket.join(room);
+
+    var is_player1 = request_handler.is_player1(user_id);
+
+    var response_for_sender = get_response(true, null, {room: room, msg: join_room_result.msg, is_p1: is_player1, details: room});
+    var response_for_opponent = get_response(true, null, {room: room, msg: join_room_result.msg, is_p1: !is_player1, details: room});
+    io.to(socket.id).emit('render', response_for_sender);
+    socket.to(room).emit('render', response_for_opponent);
+
+
+  })
+  socket.on('move', function(move_string){
+
+    var user_id = req.session.user_id;
+    var is_player1 = request_handler.is_player1(user_id);
+    var move_result = request_handler.make_move(move_string, user_id);
+    var room = request_handler.get_user_room(user_id);
+
+    if(!move_result.success){
+      io.to(socket.id).emit('render', get_response(true, null, {details: room, is_p1: is_player1, msg: move_result.msg}));
+      return;
+    }
+
+    //success move
+
+    var response_for_sender = get_response(true, null, {details: room, is_p1: is_player1, msg: move_result.msg});
+    var response_for_opponent = get_response(true, null, {details: room, is_p1: !is_player1, msg: "Your opponent just made a move"});
+
+    io.to(socket.id).emit('render', response_for_sender);
+    socket.to(room).emit('render', response_for_opponent);
 
   });
+  socket.on('quit', function(){
+    var user_id = req.session.user_id;
+    var result = request_handler.quit_room(user_id);
+
+    io.to(socket.id).emit('quit', get_response(result.success, null, {msg: result.msg}));
+  });
+
   socket.on('disconnect', function(){
+
+
     console.log('user disconnected');
   })
 });
-http.listen(3000, function(){
-  console.log('listening on *:3000');
+http.listen(PORT, function(){
+  console.log(`listening on *:${PORT}`);
 
 
 });

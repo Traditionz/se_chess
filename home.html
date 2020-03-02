@@ -1,41 +1,192 @@
-<!DOCTYPE HTML?
-<html>
+<!--Home version 2 by Ziwei Hou (Doing icon/background)-->
+<!DOCTYPE HTML>
+<html lang="en">
 	<head>
-		<script type="text/javascript">
-			//create a chess game and generate room key
-			function play(){
-				//generate key for room
-				
-				//changes page to the chess page
-				window.location.href = 'launch.html'
-				
-			};
-			
-			
-			//join a pre-existing game
-			function join(){
-				//gets the value that is entered in the text box
-				var codeID = document.getElementById("key").value;
-				console.log(codeID);
-			};
-		</script>
-		<title>
-			Chess
-		</title>
+		<link rel="SHORTCUT ICON" href="" type="image/x-icon" />
+		<link rel="ICON" href="" type="image/ico" />
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width = device-width, initial-scale = 1">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+
+		<title>Interactive Chess</title>
+
+		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+		<style>
+			body {
+				background-image: url('img/background2.jpg');
+				background-size: 100vw 100vh;
+			}
+			.container1 {
+				position: absolute;
+				top: 47%;
+				left: 50%;
+				margin-top: -200px;
+				margin-left: -230px;
+				width: 450px;
+				height: 225px;
+				vertical-align: middle;
+				padding: 10px;
+				border: 2px solid #000;
+				border-radius: 15px;
+				-moz-border-radius: 15px;
+				background-color:aliceblue;
+			}
+
+			.container2 {
+				position: absolute;
+				top: 72%;
+				left: 50%;
+				margin-top: -200px;
+				margin-left: -230px;
+				width: 450px;
+				height: 250px;
+				vertical-align: middle;
+				padding: 10px;
+				border: 2px solid #000;
+				border-radius: 15px;
+				-moz-border-radius: 15px;
+				background-color: aliceblue;
+			}
+
+
+			.button {
+				background:    #00FF7F;
+				border-radius: 75%;
+				padding:       8px 20px;
+				color:         #000;
+				display:       inline-block;
+				font:          normal 700 24px/1 "Calibri", sans-serif;
+				text-align:    center;
+			}
+
+
+			label {
+				display: inline-block;
+				width: 200px;
+				text-align: center;
+			}
+
+			input {
+				margin-top: 5px;
+				margin-bottom: 5px;
+				display: inline-block;
+				vertical-align: left-side;
+				margin-left: 0px;
+				width: 200px
+			}
+			.submit_button1 {
+				background-color: #4CAF50; /* Green */
+				border: none;
+				border-radius: 12px;
+				color: white;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 22px;
+				margin: 4px 2px;
+				cursor: pointer;
+				width: 200px;
+			}
+
+			.submit_button2 {
+				background-color: #4486c6; /* Blue */
+				border: none;
+				border-radius: 12px;
+				color: white;
+				padding: 15px 32px;
+				text-align: center;
+				text-decoration: none;
+				display: inline-block;
+				font-size: 22px;
+				margin: 4px 2px;
+				cursor: pointer;
+				width: 200px;
+			}
+
+			.button1 {
+				width: 200px;
+			}
+		</style>
 	</head>
-	
+
+	<script>
+	socket = null;
+	$(function(){
+		socket = io();
+
+		$("#join").submit(function(e){
+      e.preventDefault(); //prevent page reloading
+  		var room = $('#room_id').val();
+      var usr = $("#usr_name2").val();
+  		$('#room_id').val('');
+      $("#usr_name2").val('');
+  		console.log("Join room " + room + "with username" + usr);
+  		socket.emit('join_home_page', {room: room, username: usr});
+    });
+
+    $("#create").submit(function(e){
+      e.preventDefault(); //prevent page reloading
+      console.log("Create room");
+      var usr = $("#usr_name1").val();
+      $("#usr_name1").val('');
+  		socket.emit('create', {username: usr});
+    });
+
+		socket.on('join', function(response){
+		window.location.replace(response);
+		})
+	});
+
+
+	</script>
 	<body>
-		<!--Button that calls the play() function -->
-		<div>
-			<input onclick="play()" type="button" value="Play!">
+		<div class="title">
+			<center>
+				<br><br><img src="/img/logo.png">
+			</center>
 		</div>
-		<!--Text box to enter the room key -->
-		<div>
-			<input type=text placeholder="Enter room ID" id="key">
+
+		<div class="container1">
+			<center>
+				<h2>Create a game</h2>
+				<div>
+          <form id="create">
+            <label>Username:</label>
+  					<input type="text" id="usr_name1" placeholder="Username" rows="1" required></label>
+  					<br><br>
+  					<button class="submit_button1" id="create">Create</button>
+  					<br><br>
+          </form>
+				</div>
+
+				<br>
+			</center>
 		</div>
-		<!--Button that calls the join() function -->
-		<div>
-			<input onclick="join()" type="button" value="Join game">
+
+		<div class="container2">
+			<center>
+				<h2>Join a Game</h2>
+				<div>
+          <form id="join">
+            <label>Username:</label>
+            <input type="text" id="usr_name2" placeholder="Username" rows="1" required></label>
+            <label>Room ID:</label>
+            <input type="text" id="room_id" placeholder="Room id" rows="1" required></label>
+            <br><br>
+            <button class="submit_button1">Join</button>
+            <br><br>
+          </form>
+				</div>
+				<br>
+			</center>
 		</div>
+
+
 	</body>
 </html>
