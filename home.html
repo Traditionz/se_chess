@@ -1,4 +1,3 @@
-<!--Home version 2 by Ziwei Hou (Doing icon/background)-->
 <!DOCTYPE HTML>
 <html lang="en">
 	<head>
@@ -11,11 +10,10 @@
 
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
-
 		<title>Interactive Chess</title>
 
-		<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
+	
+		
 		<style>
 			body {
 				background-image: url('img/background2.jpg');
@@ -23,88 +21,86 @@
 			}
 			.container1 {
 				position: absolute;
-				top: 47%;
+				top: 48%;
 				left: 50%;
 				margin-top: -200px;
 				margin-left: -230px;
 				width: 450px;
-				height: 225px;
-				vertical-align: middle;
+				height: 230px;
 				padding: 10px;
-				border: 2px solid #000;
-				border-radius: 15px;
-				-moz-border-radius: 15px;
+				border: 0px solid #000;
+				border-radius: 12px;
+				-moz-border-radius: 12px;
 				background-color:aliceblue;
 			}
 
 			.container2 {
 				position: absolute;
-				top: 72%;
+				top: 74%;
 				left: 50%;
 				margin-top: -200px;
 				margin-left: -230px;
 				width: 450px;
-				height: 250px;
-				vertical-align: middle;
+				height: 320px;
 				padding: 10px;
-				border: 2px solid #000;
-				border-radius: 15px;
-				-moz-border-radius: 15px;
+				border: px solid #000;
+				border-radius: 12px;
+				-moz-border-radius: 12px;
 				background-color: aliceblue;
 			}
-
 
 			.button {
 				background:    #00FF7F;
 				border-radius: 75%;
 				padding:       8px 20px;
 				color:         #000;
-				display:       inline-block;
 				font:          normal 700 24px/1 "Calibri", sans-serif;
 				text-align:    center;
 			}
 
-
-			label {
-				display: inline-block;
-				width: 200px;
-				text-align: center;
+			input[type=text] {
+				width: 70%;
+				padding: 12px 20px;
+				margin: 8px 0;
+				box-sizing: border-box;
+				border: none;
+				border-radius: 3px;
+				border-bottom: 2px solid black;
 			}
-
-			input {
-				margin-top: 5px;
-				margin-bottom: 5px;
-				display: inline-block;
-				vertical-align: left-side;
-				margin-left: 0px;
-				width: 200px
-			}
+			
 			.submit_button1 {
+				display: inline-block;
 				background-color: #4CAF50; /* Green */
 				border: none;
-				border-radius: 12px;
+				border-radius: 20px;
 				color: white;
-				padding: 15px 32px;
+				padding: 10px 32px;
 				text-align: center;
 				text-decoration: none;
-				display: inline-block;
-				font-size: 22px;
-				margin: 4px 2px;
+				font-size: 15px;
+				margin: 2px 1px;
 				cursor: pointer;
 				width: 200px;
 			}
+			
+			label {
+				display: inline-block;
+				width: 300px;
+				height: 1px;
+				text-align: left;
+			}
 
 			.submit_button2 {
+				display: inline-block;
 				background-color: #4486c6; /* Blue */
 				border: none;
-				border-radius: 12px;
+				border-radius: 20px;
 				color: white;
-				padding: 15px 32px;
+				padding: 10px 32px;
 				text-align: center;
 				text-decoration: none;
-				display: inline-block;
-				font-size: 22px;
-				margin: 4px 2px;
+				font-size: 15px;
+				margin: 2px 1px;
 				cursor: pointer;
 				width: 200px;
 			}
@@ -112,6 +108,8 @@
 			.button1 {
 				width: 200px;
 			}
+			
+			
 		</style>
 	</head>
 
@@ -121,30 +119,31 @@
 		socket = io();
 
 		$("#join").submit(function(e){
-      e.preventDefault(); //prevent page reloading
-  		var room = $('#room_id').val();
-      var usr = $("#usr_name2").val();
-  		$('#room_id').val('');
-      $("#usr_name2").val('');
-  		console.log("Join room " + room + "with username" + usr);
-  		socket.emit('join_home_page', {room: room, username: usr});
-    });
+			e.preventDefault(); //prevent page reloading
+			var room = $('#room_id').val();
+			var usr = $("#usr_name2").val();
+			$('#room_id').val('');
+			$("#usr_name2").val('');
+			console.log("Join room " + room + "with username" + usr);
+			socket.emit('join_home_page', {room: room, username: usr});
+		});
 
-    $("#create").submit(function(e){
-      e.preventDefault(); //prevent page reloading
-      console.log("Create room");
-      var usr = $("#usr_name1").val();
-      $("#usr_name1").val('');
-  		socket.emit('create', {username: usr});
-    });
+		$("#create").submit(function(e){
+			e.preventDefault(); //prevent page reloading
+			console.log("Create room");
+			var usr = $("#usr_name1").val();
+			$("#usr_name1").val('');
+			socket.emit('create', {username: usr});
+		});
 
 		socket.on('join', function(response){
-		window.location.replace(response);
+			window.location.replace(response);
 		})
+		
 	});
 
-
 	</script>
+	
 	<body>
 		<div class="title">
 			<center>
@@ -154,35 +153,38 @@
 
 		<div class="container1">
 			<center>
-				<h2>Create a game</h2>
-				<div>
-          <form id="create">
-            <label>Username:</label>
-  					<input type="text" id="usr_name1" placeholder="Username" rows="1" required></label>
-  					<br><br>
-  					<button class="submit_button1" id="create">Create</button>
-  					<br><br>
-          </form>
-				</div>
-
+				<h2><b>Create</b></h2>
+			<div>
+				<form id="create">
+				
+					<label>Username</label>
+					<input type="text" id="usr_name1" placeholder="Username"></input>
+					<br><br>
+					<button class="submit_button1" id="create">Create</button>
+					<br><br>
+					
+				</form>
+			</div>
 				<br>
 			</center>
 		</div>
 
 		<div class="container2">
 			<center>
-				<h2>Join a Game</h2>
-				<div>
-          <form id="join">
-            <label>Username:</label>
-            <input type="text" id="usr_name2" placeholder="Username" rows="1" required></label>
-            <label>Room ID:</label>
-            <input type="text" id="room_id" placeholder="Room id" rows="1" required></label>
-            <br><br>
-            <button class="submit_button1">Join</button>
-            <br><br>
-          </form>
-				</div>
+				<h2><b>Join</b></h2>
+			<div>
+				<form id="join">
+				
+					<label>Username</label>
+					<input type="text" id="usr_name2" placeholder="Username" required></input>
+					<label>Room ID</label>
+					<input type="text" id="room_id" placeholder="Room ID" required></input>
+					<br><br>
+					<button class="submit_button2">Join</button>
+					<br><br>
+
+				</form>
+			</div>
 				<br>
 			</center>
 		</div>
