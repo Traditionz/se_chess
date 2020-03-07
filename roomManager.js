@@ -52,7 +52,7 @@ class RoomManager{
       }
     }
     this.USER_TO_ROOM[user_id] = room_id;
-    var msg = "Success to join!";
+    var msg = "You have joined the room successfully!";
     if(this.is_full(room_id)){
       room.pause = false;
       msg = "Ready to start the game!";
