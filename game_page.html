@@ -7,7 +7,7 @@
 
       body { font: "Times New Roman", Times, serif;
 			background-image: url('img/background2.jpg');
-			background-size: 100vw 100vh;
+			background-size: 150vw 150vh;
 	  }
 
       #chessBoard{
@@ -29,21 +29,21 @@
           background-color: rgb(222,184,135);
           border: 1px solid black;
       }
-	  
+
 	  ul {
 		list-style-type: none;
 		overflow: hidden;
 		background-color: #333;
 		width: 100%;
 		}
-		
+
 	.navbar {
 		background-color: #333;
 		bottom: 0;
 		width: 100%;
 		}
-	
-	  
+
+
 	.button1 {
 		background-color: red; /* Blue */
 		border: none;
@@ -52,22 +52,23 @@
 		padding: 10px 32px;
 		text-align: center;
 		text-decoration: none;
-		font-size: 15px;
+		font-size: 1.5em;
 		margin: 0 auto;
 		cursor: pointer;
 		width: 200px;
 		justify-content: center;
 		}
-	
+
 	.tag1 {
 		border-radius: 15px;
+    font-size: 1.3em;
 		background-color: black;
 		margin: 0 auto;
 		width: 15%;
 		text-align:center;
 		padding: 10px 32px;
 		}
-	
+
 	.sidebar {
 		display: inline-block;
 		background-color: grey;
@@ -87,8 +88,11 @@
 		border-style: solid;
 		border-width: 2px;
 	}
-		
-		
+  #message{
+    font-size:1.5em !important;
+  }
+
+
     </style>
   </head>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -297,52 +301,51 @@
   <body>
     <!--<div class="container-fluid text-center h2 m-3" id="room">
     </div> -->
-	
+
 	<ul>
 		<center>
 		<h2 style="color:white" id="room"></h2>
-		<p id="message" style="color:white"></p> 
+		<p id="message" style="color:white"></p>
 		</center>
 	</ul>
-	
+<!--
 	<buttonbox>
-		
+
 			<div class="movelogs" style="height:0%; padding:0px; background-color: white;"></div>
-		
+
 				<center>
-		
+
 					<br>
 					<form>
 						<h3>Captured Pieces</h3>
 					</form>
-					
+
 					<br>
 				</center>
-			
 
-	</buttonbox>
 
-	
+	</buttonbox> -->
+
+
 	<div>
 		<center>
 		<h2 id="turn"><h2>
 		</center>
 	</div>
 
-	
-	<div class="tag1" id="p2_info"></div>
+
+	 <div class="tag1" id="p2_info"></div>
 
     <table class='mx-auto text-center m-3' id="chessBoard"></table>
-	
+
 
     <div class="tag1" id="p1_info"></div>
-	
-	<br>
-	
+
+    <br>
 	<div class="navbar">
-		<button class='button1' id="quit">Quit Game</button>
+    <button class='button1' id="quit">Quit Game</button>
 	</div>
 
-	
+
   </body>
 </html>

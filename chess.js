@@ -14,7 +14,7 @@ class Chess{
     this.board = this.create_empty_board(this.size);
     this.current_pieces = new Set();
     this.p1_turn = p1_turn;
-
+    this.promoted_piece = "queen"; //by default, we promote queen
     this.prev_moves = [];
 
     pieces.forEach((piece) => {
@@ -135,12 +135,41 @@ class Chess{
     if(!this.is_valid_chess_move(next_row, next_col, piece))
       return [false, "Invalid move"];
 
+
     this.make_move(next_row, next_col, piece);
+
+    //special move for king: casliting
+    if(piece.type == 'king' && Math.abs(next_col - col) == 2){//move 2 col => calisting, assuming the move is valid
+      console.log("Castling");
+      var to_the_left = (next_col < col)? true : false;
+      var rock_row = row;
+      var rock_col = (to_the_left == true)? 0 : this.size - 1;
+      var rock_piece = this.board[rock_row][rock_col];
+      var rock_next_col = (to_the_left == true)? next_col + 1: next_col - 1
+      if(rock_piece.type == "rock" && rock_piece.move_cnt == 0){
+        this.make_move(rock_row, rock_next_col, rock_piece, false);
+      }
+      else{
+        console.log("Error on castling", rock_piece);
+      }
+    }
+
+    this.check_pawn_promotion(next_row, next_col);
     this.sync_avail_moves();
     this.sync_game_status();
 
 
     return [true, "Success move!"];
+  }
+  check_pawn_promotion(row, col){
+    if(row >= this.size || col >= this.size || this.board[row][col] == null || this.board[row][col].type != 'pawn')
+      return;
+    var piece = this.board[row][col];
+    var direction = (piece.is_player1 == true)? -1: 1;
+
+    if(row + direction == this.size || row + direction < 0){ //PAWN PROMOTION
+      piece.type = this.promoted_piece;
+    }
   }
   is_valid_chess_move(next_row, next_col, piece){
 
@@ -154,11 +183,20 @@ class Chess{
     }
     return false;
   }
-  make_move(next_row, next_col, piece){
+  make_move(next_row, next_col, piece, switch_turn=true){
+    //ASSUME: The move is valid
     var removed_piece = this.board[next_row][next_col];
     var row = piece.pos.row;
     var col = piece.pos.col;
-
+    //special capture move for pawn
+    if(piece.type == 'pawn' && next_col != col){// move diagonally to capture piece
+      //if En passant, replace the remove_piece with the enemy pawn at the same rank
+      //This assumes that it is valid move
+      if(removed_piece == null){
+        console.log("En passant")
+        removed_piece = this.board[row][next_col];
+      }
+    }
     this.remove_piece(removed_piece);
     this.remove_piece(piece);
 
@@ -167,15 +205,14 @@ class Chess{
     piece.move_cnt += 1;
     this.add_piece(piece);
 
-
-    this.p1_turn = !this.p1_turn;
+    if(switch_turn)
+      this.p1_turn = !this.p1_turn;
 
     this.prev_moves.push({
       from: new Pos(row, col),
       to: new Pos(next_row, next_col),
       removed_piece: removed_piece
     })
-
 
   }
   reverse_last_move(){
@@ -186,6 +223,7 @@ class Chess{
     var cur_pos = prev_move.to;
     var removed_piece = prev_move.removed_piece;
 
+    (prev_move, this.board)
     var piece = this.board[cur_pos.row][cur_pos.col];
 
     this.remove_piece(piece);
@@ -205,7 +243,7 @@ class Chess{
       return false;
     }
     var piece = this.board[row][col];
-    var moves = ChessRules.available_moves(piece, this.board);
+    var moves = ChessRules.available_moves(piece, this.board, this.prev_moves);
 
     //check if make a move lead to a check for the opponent, but only check for the player who has the turn
     piece.available_moves = [];
@@ -312,7 +350,25 @@ class ChessRules{
       return false;
     return true;
   }
-  static king_moves(piece, board){
+  static is_valid_for_castling(piece, board, direction){
+    if(piece.type != "king" || piece.move_cnt != 0)
+      return false;
+    var cur_col = piece.pos.col + direction;
+    var row = piece.pos.row;
+    var valid = false;
+    while(ChessRules.is_valid_pos(row, cur_col, board)){
+      if(board[row][cur_col] == null){
+        cur_col += direction;
+        continue;
+      }
+      if(board[row][cur_col].type == 'rock' && board[row][cur_col].move_cnt == 0){
+        valid = true;
+      }
+      break;
+    }
+    return valid;
+  }
+  static king_moves(piece, board, special){
     var moves = [];
     for(var row_padding = -1; row_padding < 2; row_padding++){
       for(var col_padding = -1; col_padding < 2; col_padding++){
@@ -323,6 +379,21 @@ class ChessRules{
         moves.push(new Pos(next_row, next_col));
       }
     }
+
+    if(special == false)
+      return moves;
+    //special move for king : Castling
+    var left_dir = -1;
+    var right_dir = 1;
+    //left
+    if(ChessRules.is_valid_for_castling(piece, board, left_dir)){
+      moves.push(new Pos(piece.pos.row, piece.pos.col + 2*left_dir))
+    }
+    //right
+    if(ChessRules.is_valid_for_castling(piece, board, right_dir)){
+      moves.push(new Pos(piece.pos.row,  piece.pos.col + 2*right_dir))
+    }
+
     return moves;
   }
   static knight_moves(piece, board){
@@ -338,7 +409,7 @@ class ChessRules{
     }
     return moves;
   }
-  static pawn_moves(piece, board){
+  static pawn_moves(piece, board, prev_moves=null, special){
     var moves = [];
     var direction = (piece.is_player1 == true)? -1: 1;
     var row = piece.pos.row;
@@ -360,6 +431,16 @@ class ChessRules{
     if(ChessRules.is_valid_to_move(up_1_row, col - 1, piece, board) && board[up_1_row][col - 1] != null)
       moves.push(new Pos(up_1_row, col - 1));
 
+    var prev_move = (prev_moves == null || prev_moves.length == 0)? null : prev_moves[prev_moves.length-1];
+
+    //check for En passant
+    //If the enemy's pawn just move up 2 row (its first move) and arrive at the same row as our pawn => we can capture that pawn
+    if(special == true && prev_move != null){
+      var prev_move_piece = board[prev_move.to.row][prev_move.to.col];
+      if(prev_move_piece.type == "pawn" && prev_move_piece.is_player1 != piece.is_player1 && prev_move_piece.pos.row == piece.pos.row && Math.abs(prev_move.from.row - prev_move.to.row) == 2){
+        moves.push(new Pos(up_1_row, prev_move_piece.pos.col));
+      }
+    }
     return moves;
   }
   static move_to_direction(row_padding, col_padding, piece, board){
@@ -408,14 +489,15 @@ class ChessRules{
     var moves = moves_up.concat(moves_down, moves_left, moves_right, moves_up_left, moves_up_right, moves_down_left, moves_down_right);
     return moves;
   }
-  static available_moves(piece, board){
+  static available_moves(piece, board, prev_moves=null, special=true){
+
     switch(piece.type){
       case "king":
-        return ChessRules.king_moves(piece, board);
+        return ChessRules.king_moves(piece, board, special);
       case "queen":
         return ChessRules.queen_moves(piece, board);
       case "pawn":
-        return ChessRules.pawn_moves(piece, board);
+        return ChessRules.pawn_moves(piece, board, prev_moves, special);
       case "rock":
         return ChessRules.rock_moves(piece, board);
       case "bishop":
@@ -434,7 +516,7 @@ class ChessRules{
         //only consider piece owns by the other player
         var piece = board[r][c];
         if(piece != null && piece.is_player1 != checked_player_1){
-          var moves = ChessRules.available_moves(piece, board);
+          var moves = ChessRules.available_moves(piece, board, null, false);
           for(var i = 0; i < moves.length; i++){
             var pos = moves[i];
             var next_piece = board[pos.row][pos.col];

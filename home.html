@@ -12,8 +12,8 @@
 
 		<title>Interactive Chess</title>
 
-	
-		
+
+
 		<style>
 			body {
 				background-image: url('img/background2.jpg');
@@ -67,7 +67,7 @@
 				border-radius: 3px;
 				border-bottom: 2px solid black;
 			}
-			
+
 			.submit_button1 {
 				display: inline-block;
 				background-color: #4CAF50; /* Green */
@@ -82,7 +82,7 @@
 				cursor: pointer;
 				width: 200px;
 			}
-			
+
 			label {
 				display: inline-block;
 				width: 300px;
@@ -108,8 +108,8 @@
 			.button1 {
 				width: 200px;
 			}
-		
-			
+
+
 		</style>
 	</head>
 
@@ -139,11 +139,11 @@
 		socket.on('join', function(response){
 			window.location.replace(response);
 		})
-		
+
 	});
 
 	</script>
-	
+
 	<body>
 		<div class="title">
 			<center>
@@ -156,13 +156,13 @@
 				<h2><b>Create</b></h2>
 			<div>
 				<form id="create">
-				
+
 					<label>Username</label>
-					<input type="text" id="usr_name1" placeholder="Username"></input>
+					<input type="text" id="usr_name1" placeholder="Username" required></input>
 					<br><br>
 					<button class="submit_button1" id="create">Create</button>
 					<br><br>
-					
+
 				</form>
 			</div>
 				<br>
@@ -174,7 +174,7 @@
 				<h2><b>Join</b></h2>
 			<div>
 				<form id="join">
-				
+
 					<label>Username</label>
 					<input type="text" id="usr_name2" placeholder="Username" required></input>
 					<label>Room ID</label>
