@@ -437,7 +437,7 @@ class ChessRules{
     //If the enemy's pawn just move up 2 row (its first move) and arrive at the same row as our pawn => we can capture that pawn
     if(special == true && prev_move != null){
       var prev_move_piece = board[prev_move.to.row][prev_move.to.col];
-      if(prev_move_piece.type == "pawn" && prev_move_piece.is_player1 != piece.is_player1 && prev_move_piece.pos.row == piece.pos.row && Math.abs(prev_move.from.row - prev_move.to.row) == 2){
+      if(prev_move_piece.type == "pawn" && prev_move_piece.is_player1 != piece.is_player1 && Math.abs(prev_move_piece.pos.row - piece.pos.row) == 1 && Math.abs(prev_move.from.row - prev_move.to.row) == 2){
         moves.push(new Pos(up_1_row, prev_move_piece.pos.col));
       }
     }
